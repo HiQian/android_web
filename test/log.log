@@ -1,0 +1,3 @@
+2020-01-09 18:06:17,286 - conn.py[line:1040] - ERROR: <BrokerConnection node_id=bootstrap-0 host=10.142.112.29:9092 <connected> [IPv4 ('10.142.112.29', 9092)]>: socket disconnected
+2020-01-09 18:06:17,396 - conn.py[line:1040] - ERROR: <BrokerConnection node_id=bootstrap-0 host=10.142.112.29:9092 <connected> [IPv4 ('10.142.112.29', 9092)]>: socket disconnected
+2020-01-09 18:06:17,506 - conn.py[line:1040] - ERROR: <BrokerConnection node_id=bootstrap-0 host=10.142.112.29:9092 <connected> [IPv4 ('10.142.112.29', 9092)]>: socket disconnected
