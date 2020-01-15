@@ -7,15 +7,17 @@ from mitmproxy import ctx
 from kafka import KafkaProducer
 import logging
 import random
-# BASE_DIR = os.getcwd()
-# sys.path.append(BASE_DIR)
 import time
+BASE_DIR = os.getcwd()
+sys.path.append(BASE_DIR)
+from app_porcess.dbUtls import MysqlPool
 
+pool = MysqlPool(host="10.144.15.187", port=3815, username='spider', passwd='QAZwsxEDC', db='spider')
 
 class BaseMimtSearch(object):
-    time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    time_str = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(time.time()))
     logger = logging.getLogger()
-    logger.setLevel(logging.WARNING)  # Log等级开关
+    logger.setLevel(logging.INFO)  # Log等级开关
     path = '../log'
     folder = os.path.exists(path)
     if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
@@ -24,7 +26,7 @@ class BaseMimtSearch(object):
     log_name = path +'/'+'log '+time_str+'.log'
     logfile = log_name
     file_handler = logging.FileHandler(logfile, mode='a+')
-    file_handler.setLevel(logging.ERROR)  # 输出到file的log等级的开关
+    file_handler.setLevel(logging.INFO)  # 输出到file的log等级的开关
     #定义handler的输出格式
     formatter = logging.Formatter("%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s ")
     file_handler.setFormatter(formatter)
@@ -53,7 +55,9 @@ class BaseMimtSearch(object):
 
     def request(self, flow: HTTPFlow):
         self.num = self.num + 1
-        ctx.log.info("Weve seen %d flows" % self.num)
+        ctx.log.warn("Weve seen %d flows" % self.num)
+        # ctx.log.warn(str(flow.request.query))
+        # ctx.log.error(str(flow.request.headers))
 
     def response(self, flow: HTTPFlow):
         pass
@@ -102,9 +106,12 @@ class TouiaoSerach(BaseMimtSearch):
                         jstr = json.dumps(item, ensure_ascii=False)
                         self.producer.send(topic=self.topic, value=jstr.encode(encoding='utf-8'), partition=random.choice(list(self.producer.partitions_for(self.topic))))
                         self.producer.send(topic=self.meta_topic, value=data_content.encode(encoding='utf-8'), partition=random.choice(list(self.producer.partitions_for(self.meta_topic))))
-                    except:
+                    except Exception as err:
                         self.logger.error('kafka send failure:host:{}, topic:{}, values:'.format(self.server, self.topic, jstr))
-                    pass
+                    sql = 'insert into android_toutiao_app(meta_data, display_url, large_image_list, title, `source`, create_time) value (%s,%s,%s,%s,%s, %s);'
+                    data_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                    args = (jstr, item.get('display_url'), item.get('large_image_list_url'), item.get('title'), item.get('source'), data_time)
+                    pool.insert(sql, args)
                 else:
                     continue
             pass
