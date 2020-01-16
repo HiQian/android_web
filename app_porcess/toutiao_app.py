@@ -71,7 +71,7 @@ if __name__ == '__main__':
     desired_caps = {}
     desired_caps['platformName'] = 'Android'
     desired_caps['platformVersion'] = '6.0.1'
-    desired_caps['deviceName'] = '10.129.33.79:8020'
+    desired_caps['deviceName'] = '10.129.33.79:5555'
     desired_caps['appPackage'] = 'com.ss.android.article.news'
     desired_caps['appActivity'] = '.activity.MainActivity'
     desired_caps['automationName'] = 'UiAutomator1'
