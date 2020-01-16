@@ -104,13 +104,14 @@ class TouiaoSerach(BaseMimtSearch):
                     jstr = ""
                     try:
                         jstr = json.dumps(item, ensure_ascii=False)
+                        meta_data = json.dumps(data_content_json, ensure_ascii=False)
                         self.producer.send(topic=self.topic, value=jstr.encode(encoding='utf-8'), partition=random.choice(list(self.producer.partitions_for(self.topic))))
                         self.producer.send(topic=self.meta_topic, value=data_content.encode(encoding='utf-8'), partition=random.choice(list(self.producer.partitions_for(self.meta_topic))))
                     except Exception as err:
                         self.logger.error('kafka send failure:host:{}, topic:{}, values:'.format(self.server, self.topic, jstr))
                     sql = 'insert into android_toutiao_app(meta_data, display_url, large_image_list, title, `source`, create_time) value (%s,%s,%s,%s,%s, %s);'
                     data_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                    args = (jstr, item.get('display_url'), item.get('large_image_list_url'), item.get('title'), item.get('source'), data_time)
+                    args = (meta_data, item.get('display_url'), item.get('large_image_list_url'), item.get('title'), item.get('source'), data_time)
                     pool.insert(sql, args)
                 else:
                     continue

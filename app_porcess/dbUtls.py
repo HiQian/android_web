@@ -118,3 +118,6 @@ class MysqlPool(object):
             conn.rollback()
         finally:
             self.connect_close(conn, cursor)
+
+    def update(self, sql, args):
+        self.insert(sql, args)
